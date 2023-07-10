@@ -1,4 +1,5 @@
-// Package token, token/token.go
+// token/token.go
+
 package token
 
 const (

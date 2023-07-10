@@ -1,4 +1,5 @@
 // lexer/lexer.go
+
 package lexer
 
 import "github.com/chaos-io/go-verse/token"

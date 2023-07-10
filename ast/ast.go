@@ -23,25 +23,14 @@ type Expression interface {
 	expressionNode()
 }
 
-type Program struct {
-	Statements []Statement
+type Identifier struct {
+	Token token.Token // token.IDENT 词法单元
+	Value string
 }
 
-func (p *Program) TokenLiteral() string {
-	if len(p.Statements) > 0 {
-		return p.Statements[0].TokenLiteral()
-	} else {
-		return ""
-	}
-}
-
-func (p *Program) String() string {
-	var out bytes.Buffer
-	for _, s := range p.Statements {
-		out.WriteString(s.String())
-	}
-	return out.String()
-}
+func (i *Identifier) expressionNode()      {}
+func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
+func (i *Identifier) String() string       { return i.Value }
 
 type LetStatement struct {
 	Token token.Token // token.LET 词法单元
@@ -66,15 +55,6 @@ func (ls *LetStatement) String() string {
 
 	return out.String()
 }
-
-type Identifier struct {
-	Token token.Token // token.IDENT 词法单元
-	Value string
-}
-
-func (i *Identifier) expressionNode()      {}
-func (i *Identifier) TokenLiteral() string { return i.Token.Literal }
-func (i *Identifier) String() string       { return i.Value }
 
 type ReturnStatement struct {
 	Token       token.Token // token.RETURN 词法单元
@@ -106,3 +86,23 @@ type ExpressionStatement struct {
 func (es *ExpressionStatement) statementNode()       {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
 func (es *ExpressionStatement) String() string       { return es.Expression.String() }
+
+type Program struct {
+	Statements []Statement
+}
+
+func (p *Program) TokenLiteral() string {
+	if len(p.Statements) > 0 {
+		return p.Statements[0].TokenLiteral()
+	} else {
+		return ""
+	}
+}
+
+func (p *Program) String() string {
+	var out bytes.Buffer
+	for _, s := range p.Statements {
+		out.WriteString(s.String())
+	}
+	return out.String()
+}
