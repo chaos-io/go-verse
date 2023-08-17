@@ -1,3 +1,3 @@
 module github.com/chaos-io/go-verse
 
-go 1.20
+go 1.21
