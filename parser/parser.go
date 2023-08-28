@@ -62,6 +62,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.INT, p.parseIntegerLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
+
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
 	p.registerInfix(token.MINUS, p.parseInfixExpression)
 	p.registerInfix(token.SLASH, p.parseInfixExpression)
@@ -79,15 +80,15 @@ func New(l *lexer.Lexer) *Parser {
 }
 
 func (p *Parser) peekPrecedence() int {
-	if p, ok := precedences[p.peekToken.Type]; ok {
-		return p
+	if _p, ok := precedences[p.peekToken.Type]; ok {
+		return _p
 	}
 	return LOWEST
 }
 
 func (p *Parser) curPrecedence() int {
-	if p, ok := precedences[p.curToken.Type]; ok {
-		return p
+	if _p, ok := precedences[p.curToken.Type]; ok {
+		return _p
 	}
 	return LOWEST
 }
@@ -134,7 +135,7 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 
 		p.nextToken()
 
-		leftExp = infix(leftExp)
+		leftExp = infix(leftExp) // 即 parseInfixExpression
 	}
 
 	return leftExp
@@ -182,6 +183,13 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 	precedence := p.curPrecedence()
 	p.nextToken()
 	expression.Right = p.parseExpression(precedence)
+
+	// 将+改为右关联
+	// if expression.Operator == "+" {
+	// 	expression.Right = p.parseExpression(precedence - 1)
+	// } else {
+	// 	expression.Right = p.parseExpression(precedence)
+	// }
 
 	return expression
 }
