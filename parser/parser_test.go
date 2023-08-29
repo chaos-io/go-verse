@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/chaos-io/go-verse/ast"
@@ -204,26 +203,6 @@ func TestParsingPrefixExpressions(t *testing.T) {
 			return
 		}
 	}
-}
-
-func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
-	literal, ok := il.(*ast.IntegerLiteral)
-	if !ok {
-		t.Errorf("il not *ast.IntegerLiteral. got=%T", il)
-		return false
-	}
-
-	if literal.Value != value {
-		t.Errorf("literal.Value not %d. got=%d", value, literal.Value)
-		return false
-	}
-
-	if literal.TokenLiteral() != fmt.Sprintf("%d", value) {
-		t.Errorf("literal.TokenLiteral not %d. got=%s", value, literal.TokenLiteral())
-		return false
-	}
-
-	return true
 }
 
 // 中缀运算法
