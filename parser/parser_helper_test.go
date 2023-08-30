@@ -8,6 +8,30 @@ import (
 	"github.com/chaos-io/go-verse/lexer"
 )
 
+func TestHelper(t *testing.T) {
+	l := lexer.New("5+10;")
+	p := New(l)
+	program := p.ParseProgram()
+	statement := program.Statements[0].(*ast.ExpressionStatement)
+	infixExpression := statement.Expression.(*ast.InfixExpression)
+	testInfixExpression(t, infixExpression, 5, "+", 10)
+}
+
+func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) bool {
+	switch v := expected.(type) {
+	case int:
+		return testIntegerLiteral(t, exp, int64(v))
+	case int64:
+		return testIntegerLiteral(t, exp, v)
+	case string:
+		return testIdentifier(t, exp, v)
+	case bool:
+		return testBooleanLiteral(t, exp, v)
+	}
+	t.Errorf("type of exp not handled. got=%T", exp)
+	return false
+}
+
 func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 	literal, ok := il.(*ast.IntegerLiteral)
 	if !ok {
@@ -48,19 +72,6 @@ func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
 	return true
 }
 
-func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{}) bool {
-	switch v := expected.(type) {
-	case int:
-		return testIntegerLiteral(t, exp, int64(v))
-	case int64:
-		return testIntegerLiteral(t, exp, v)
-	case string:
-		return testIdentifier(t, exp, v)
-	}
-	t.Errorf("type of exp not handled. got=%T", exp)
-	return false
-}
-
 func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, operator string, right interface{}) bool {
 	opExp, ok := exp.(*ast.InfixExpression)
 	if !ok {
@@ -84,11 +95,22 @@ func testInfixExpression(t *testing.T, exp ast.Expression, left interface{}, ope
 	return true
 }
 
-func TestHelper(t *testing.T) {
-	l := lexer.New("5+10;")
-	p := New(l)
-	program := p.ParseProgram()
-	statement := program.Statements[0].(*ast.ExpressionStatement)
-	infixExpression := statement.Expression.(*ast.InfixExpression)
-	testInfixExpression(t, infixExpression, 5, "+", 10)
+func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {
+	bo, ok := exp.(*ast.Boolean)
+	if !ok {
+		t.Errorf("exp is not ast.Boolean. got=%T", exp)
+		return false
+	}
+
+	if bo.Value != value {
+		t.Errorf("bo.Value is not %t. got=%t", value, bo.Value)
+		return false
+	}
+
+	if bo.TokenLiteral() != fmt.Sprintf("%t", value) {
+		t.Errorf("bo.TokenLiteral not %t. got=%s", value, bo.TokenLiteral())
+		return false
+	}
+
+	return true
 }
