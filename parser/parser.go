@@ -351,17 +351,17 @@ func (p *Parser) parseLetStatement() ast.Statement {
 		return nil
 	}
 
-	stmt.Name = &ast.Identifier{
-		Token: p.curToken,
-		Value: p.curToken.Literal,
-	}
+	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
 
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
 
-	// TODO: 跳过对表达式的处理，直到遇见分号
-	if !p.curTokenIs(token.SEMICOLON) {
+	p.nextToken()
+
+	stmt.Value = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -373,8 +373,9 @@ func (p *Parser) parseReturnStatement() ast.Statement {
 
 	p.nextToken()
 
-	// TODO: 跳过对表达式的处理，直到遇见分号
-	if !p.curTokenIs(token.SEMICOLON) {
+	stmt.ReturnValue = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
